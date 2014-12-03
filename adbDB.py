@@ -20,9 +20,7 @@ if __name__=="__main__":
 		else:
 			adb = platfromtools + "adb"
 			sqlite = platfromtools + "sqlite3"
-		
-		
-		cmdline("%s kill-server" % adb)
+				
 		cmdline("%s start-server" % adb)
 		devices = cmdline(adb + " devices").split("\n")[1:]
 		devices = [device for device in devices if device != '']
