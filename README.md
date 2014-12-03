@@ -4,7 +4,6 @@ adbDB
 Getting .db files from debugged projects
 
 ## Requirements
-- Python3!!
 - Android SDK with Platform-tools installed
 - Android device
 
