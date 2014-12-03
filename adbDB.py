@@ -164,3 +164,4 @@ if __name__=="__main__":
 				print("Inavlid input, please insert a valid number!")
 	else:
 		print("Please launch the 'Android SDK Manager' and download Platform Tools!")
+		doExit()
