@@ -54,6 +54,8 @@ def selectDevice():
 # Ask the user which package to use
 def selectPackage(device):
 	packages = cmdline("%s -s %s shell pm list packages -3 -i" % (adb, device))
+	
+		
 	packages = makeCleanArray(packages, "\n", 0, ["\r",""])
 	newPackages = []
 	if (len(packages) == 0):
@@ -82,7 +84,11 @@ def selectPackage(device):
 
 # Ask the user which file to select
 def selectFile(device, package):
-	files =	makeCleanArray(cmdline("%s -s %s shell run-as %s ls databases/" % (adb, device, package)), "\n",0,["","\r"])
+	res = cmdline("%s -s %s shell run-as %s ls databases/" % (adb, device, package))
+	if (res.find("is not debuggable") != -1):
+		print("This package is not debuggale!")
+		sys.exit(1)
+	files =	makeCleanArray(res, "\n",0,["","\r"])
 	if (len(files) == 1 and files[0] == ""):
 		print("No available files")
 		sys.exit(1)
