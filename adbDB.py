@@ -153,7 +153,10 @@ if __name__=="__main__":
 					cmdline("%s -s %s pull /sdcard/%s" % (adb, selectedDevice, selectedFile))
 					cmdline("%s -s %s shell rm /sdcard/%s" % (adb, selectedDevice, selectedFile))
 					flag = False
-					print("Downloaded!, saved as: %s/%s" % (cmdline("pwd").replace("\n",""),selectedFile))
+					if (OS == 'Windows'):
+						print("Downloaded!, saved as: %s/%s" % (cmdline("echo %CD%").replace("\n",""),selectedFile))
+					else:
+						print("Downloaded!, saved as: %s/%s" % (cmdline("pwd").replace("\n",""),selectedFile))
 				elif (userInput == 2):
 					cmdline("{0} -s {1} shell run-as {2} rm databases/{3} databases/{3}-journal".format(adb, selectedDevice, selectedPackage, selectedFile))
 					flag = False
