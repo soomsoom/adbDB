@@ -1,20 +1,22 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-	
 import os, platform, re, sys
-from msvcrt import getch
+
 from subprocess import PIPE, Popen
 
 SDK_PATH = "/opt/android-sdk/"
 OS = platform.system()
 
 # Makeing widows users will see the messages!
-def exit():
+def doExit():
 	if (OS == 'Windows'):
-		print('Press Any key to continue...")
-		getch()
-		sys.exit(1)
+		c = "1"
+		while (c == "1"):
+			c = input("Press ENTER to continue...")
+		raise SystemExit
+		
 	else:
-		sys.exit(1)
+		raise SystemExit
 		
 		
 # Command line to control adb
@@ -40,7 +42,7 @@ def selectDevice():
 	userInput = 0
 	if (len(devices) == 0):
 		print("No available devices")
-		exit()
+		doExit()
 	
 	print("# Please select a device:")
 	i=1
@@ -70,7 +72,7 @@ def selectPackage(device):
 	newPackages = []
 	if (len(packages) == 0):
 		print("No available packages")
-		exit()
+		doExit()
 	
 	print("# Please select a package:")
 	i=1
@@ -97,11 +99,11 @@ def selectFile(device, package):
 	res = cmdline("%s -s %s shell run-as %s ls databases/" % (adb, device, package))
 	if (res.find("is not debuggable") != -1):
 		print("This package is not debuggale!")
-		exit()
+		doExit()
 	files =	makeCleanArray(res, "\n",0,["","\r"])
 	if (len(files) == 1 and files[0] == ""):
 		print("No available files")
-		exit()
+		doExit()
 		
 	newFiles = []
 	print("# Please select a file:")
