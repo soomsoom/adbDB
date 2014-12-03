@@ -162,6 +162,7 @@ if __name__=="__main__":
 					print("What?! try again")
 			except:
 				print("Inavlid input, please insert a valid number!")
+			doExit()
 	else:
 		print("Please launch the 'Android SDK Manager' and download Platform Tools!")
 		doExit()
