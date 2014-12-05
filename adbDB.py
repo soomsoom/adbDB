@@ -38,6 +38,8 @@ def makeCleanArray(text,splitCndition, start=0, replaces=[]):
 
 # Ask the user in which device to use
 def selectDevice():
+	devices = cmdline("%s devices" % adb)
+	devices = [device for device in devices if device != '']
 	devices = makeCleanArray(cmdline("%s devices" % adb),"\n",1,[" ", "\tdevice","\r"])
 	userInput = 0
 	if (len(devices) == 0):
@@ -65,10 +67,15 @@ def selectDevice():
 		
 # Ask the user which package to use
 def selectPackage(device):
-	packages = cmdline("%s -s %s shell pm list packages -3 -i" % (adb, device))
+	androidSdkVersion = int(cmdline("%s -s %s shell getprop ro.build.version.sdk" % (adb, device)))
 	
+	if (androidSdkVersion > 15):
+		packages = cmdline("%s -s %s shell pm list packages -3 -i" % (adb, device))
+	else:
+		packages = cmdline("%s -s %s shell pm list packages -3" % (adb, device))
 		
 	packages = makeCleanArray(packages, "\n", 0, ["\r",""])
+
 	newPackages = []
 	if (len(packages) == 0):
 		print("No available packages")
@@ -77,10 +84,16 @@ def selectPackage(device):
 	print("# Please select a package:")
 	i=1
 	for package in packages:
-		if(package.find("installer=null") != -1):
-			newPackages.append(package.replace("installer=null", "").replace(" ", "").replace("package:",""))
+		if (androidSdkVersion > 15):
+			if (package.find("installer=null") != -1):
+				newPackages.append(package.replace("installer=null", "").replace(" ", "").replace("package:",""))
+				print("%d) %s" % (i, newPackages[i-1]))
+				i = i + 1
+		else:
+			newPackages.append(package.replace(" ", "").replace("package:",""))
 			print("%d) %s" % (i, newPackages[i-1]))
 			i = i + 1
+
 	while(True):
 		userInput = input(">> ")
 		try:
@@ -149,9 +162,9 @@ if __name__=="__main__":
 			try:
 				userInput = int(userInput)
 				if (userInput == 1): 
-					cmdline("{0} -s {1} shell run-as {2} cp databases/{3} /sdcard/".format(adb, selectedDevice, selectedPackage, selectedFile))
-					cmdline("%s -s %s pull /sdcard/%s" % (adb, selectedDevice, selectedFile))
-					cmdline("%s -s %s shell rm /sdcard/%s" % (adb, selectedDevice, selectedFile))
+					cmdline("{0} -s {1} shell run-as {2} chmod 666 databases/{3}".format(adb, selectedDevice, selectedPackage, selectedFile))
+					cmdline("%s -s %s pull /data/data/%s/databases/%s" % (adb, selectedDevice, selectedPackage, selectedFile))
+					cmdline("{0} -s {1} shell run-as {2} chmod 600 databases/{3}".format(adb, selectedDevice, selectedPackage, selectedFile))
 					flag = False
 					if (OS == 'Windows'):
 						print("Downloaded!, saved as: %s/%s" % (cmdline("echo %CD%").replace("\n",""),selectedFile))
