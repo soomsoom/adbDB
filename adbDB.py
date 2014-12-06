@@ -123,7 +123,7 @@ def selectFile(device, package):
 		
 	files =	makeCleanArray(res, "\n",0,["","\r"])
 
-	if (len(files) == 1 and files[0] != ""):
+	if (len(files) == 1 and files[0] == ""):
 		print("No available files")
 		doExit()	
 		
