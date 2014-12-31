@@ -7,6 +7,29 @@ from subprocess import PIPE, Popen
 SDK_PATH = "/opt/android-sdk/"
 OS = platform.system()
 
+# Command line to control adb
+def cmdline(command):
+	process = Popen(args=command, stdout=PIPE, shell=True)
+	return process.communicate()[0].decode("UTF-8")
+	
+if (OS == 'Windows'):
+	currentPath = cmdline('echo %CD%').rstrip("\n").rstrip("\r")
+else:
+	currentPath = cmdline('pwd').rstrip("\n").rstrip("\r")
+
+# Pushing a file to selected package
+def pushFile(selectedDevice, selectedPackage, selectedFile):
+	fileCurrentPath = currentPath+"/"+selectedFile
+	if (os.path.exists(fileCurrentPath)):
+		cmdline("{0} -s {1} shell run-as {2} chmod 666 databases/{3}".format(adb, selectedDevice, selectedPackage, selectedFile))
+		cmdline("{0} -s {1} push {3} /data/data/{2}/databases/{3}".format(adb, selectedDevice, selectedPackage, selectedFile))
+		cmdline("{0} -s {1} shell run-as {2} chmod 600 databases/{3}".format(adb, selectedDevice, selectedPackage, selectedFile))
+		print("Done!")
+	else:
+		print("File not found!")
+		
+	
+
 # Makeing widows users will see the messages!
 def doExit(exit=1):
 	c = "1"
@@ -14,14 +37,7 @@ def doExit(exit=1):
 		c = input("Press ENTER to continue...")
 	if(exit == 1):
 		raise SystemExit
-		
-		
-# Command line to control adb
-def cmdline(command):
-	process = Popen(args=command, stdout=PIPE, shell=True)
-	return process.communicate()[0].decode("UTF-8")
-	
-	
+
 # Get some string from cmd result and make a clean array
 def makeCleanArray(text,splitCndition, start=0, replaces=[]):
 	
@@ -157,13 +173,16 @@ def selectFile(device, package):
 def mainProgram():
 	os.system(['clear','cls'][os.name == 'nt'])
 	flag = True
+	dbExists = False
 	selectedDevice  = selectDevice()
 	selectedPackage = selectPackage(selectedDevice)
 	selectedFile = selectFile(selectedDevice, selectedPackage)
 	
 	print("# Press '1' to get the file")
 	print("# Press '2' to remove it from device")
-		
+	if (os.path.exists(currentPath+"/"+selectedFile) == True):
+		print("# Press '3' to push the file")
+		dbExists = True
 	while(flag):
 		userInput = input(">> ")
 		try:
@@ -181,6 +200,9 @@ def mainProgram():
 				cmdline("{0} -s {1} shell run-as {2} rm databases/{3} databases/{3}-journal".format(adb, selectedDevice, selectedPackage, selectedFile))
 				flag = False
 				print("Removed!")
+			elif ((userInput == 3) and (dbExists == True)):
+				flag = False
+				pushFile(selectedDevice, selectedPackage, selectedFile)
 			else:
 				print("What?! try again")
 		except:
